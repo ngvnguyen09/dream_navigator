@@ -427,13 +427,25 @@
       startPollingStatus();
     }
 
-    function toggleListening() {
+    async function toggleListening() {
       if (!recognition) return;
       
       if (isListening) {
         recognition.stop();
       } else {
-        recognition.start();
+        try {
+          // Explicitly request microphone permission to force the prompt on mobile
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+             // Stop the tracks immediately as we only need the permission, not the stream itself
+             stream.getTracks().forEach(track => track.stop());
+          }
+          recognition.start();
+        } catch (err) {
+          console.error("Microphone access denied: ", err);
+          helperText.textContent = "Cần cấp quyền Micro để sử dụng tính năng này.";
+          statusText.textContent = "Chưa cấp quyền Micro";
+        }
       }
     }
 
