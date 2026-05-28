@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hình Ảnh Làm Việc – DreamNavigator</title>
+  <link rel="icon" type="image/png" href="assets/logo_maker.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Three.js LOCAL (no CDN) -->
+  <script src="three.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background:#0a0a0a; overflow:hidden; font-family:'Lexend',sans-serif; color:#fff; }
+    #canvas-container { position:fixed; inset:0; }
+
+    /* Loading */
+    #loading-screen {
+      position:fixed; inset:0; z-index:100; background:#0a0a0a;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:26px;
+      transition:opacity .8s ease;
+    }
+    #loading-screen.fade-out { opacity:0; pointer-events:none; }
+    .spinner { width:70px; height:70px; border-radius:50%; border:3px solid rgba(255,255,255,.1); border-top-color:#3b82f6; animation:spin 1s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-title { font-family:'Dancing Script',cursive; font-size:clamp(1.4rem,4vw,2.2rem); color:#fff; text-align:center; }
+    .loading-sub { color:rgba(255,255,255,.4); font-size:.87rem; text-align:center; margin-top:5px; }
+    .progress-bar-wrap { width:200px; height:4px; border-radius:4px; background:rgba(255,255,255,.08); overflow:hidden; }
+    #progress-fill { height:100%; width:0%; background:linear-gradient(90deg,#3b82f6,#60a5fa); border-radius:4px; transition:width .3s ease; }
+    #progress-text { color:rgba(255,255,255,.3); font-size:.72rem; }
+
+    /* Buttons */
+    .btn-glass {
+      padding:11px 22px; font-size:.93rem; font-family:'Lexend',sans-serif; font-weight:600;
+      background:rgba(255,255,255,.11); color:#fff; border:1px solid rgba(255,255,255,.28);
+      border-radius:30px; cursor:pointer; backdrop-filter:blur(10px);
+      transition:background .3s,transform .3s; position:absolute; z-index:10;
+    }
+    .btn-glass:hover { background:rgba(255,255,255,.2); transform:scale(1.05); }
+    .btn-circle { width:46px; height:46px; padding:0; border-radius:50%; font-size:1.45rem; display:flex; align-items:center; justify-content:center; }
+
+    #btn-back { top:20px; left:20px; width:44px; height:44px; padding:0; border-radius:50%; font-size:1.1rem; display:flex; align-items:center; justify-content:center; text-decoration:none; color:#fff; opacity:0; transition:opacity .5s; }
+
+    #gallery-title {
+      position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+      font-family:'Dancing Script',cursive; font-size:clamp(2rem,6vw,4.2rem);
+      color:#fff; text-shadow:0 4px 20px rgba(0,0,0,.9); white-space:nowrap;
+      pointer-events:none; text-align:center; z-index:5;
+      transition:all .8s cubic-bezier(.25,1,.5,1);
+    }
+
+    #btn-view { bottom:40px; left:50%; transform:translateX(-50%); opacity:0; transition:opacity .5s,transform .5s; }
+    #btn-prev { left:20px; top:50%; transform:translateY(-50%) scale(0); opacity:0; transition:opacity .4s,transform .4s; }
+    #btn-next { right:20px; top:50%; transform:translateY(-50%) scale(0); opacity:0; transition:opacity .4s,transform .4s; }
+    #btn-sphere { bottom:40px; right:40px; transform:translateY(100px) scale(.8); opacity:0; transition:opacity .4s,transform .4s; }
+
+    /* Lightbox */
+    #lightbox { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.93); display:none; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
+    #lightbox.active { display:flex; }
+    #lb-media img, #lb-media video { max-width:90vw; max-height:80vh; border-radius:12px; object-fit:contain; box-shadow:0 20px 60px rgba(0,0,0,.8); }
+    #btn-close-lb { position:fixed; top:20px; right:20px; z-index:210; width:44px; height:44px; padding:0; border-radius:50%; font-size:1.2rem; }
+    #lb-prev { position:fixed; left:20px; top:50%; transform:translateY(-50%); z-index:210; }
+    #lb-next { position:fixed; right:20px; top:50%; transform:translateY(-50%); z-index:210; }
+    .lb-caption { font-size:.82rem; color:rgba(255,255,255,.45); letter-spacing:.05em; }
+  </style>
+</head>
+<body>
+
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <div>
+    <p class="loading-title">Hình Ảnh Làm Việc</p>
+    <p class="loading-sub">Đang tải ảnh...</p>
+  </div>
+  <div class="progress-bar-wrap"><div id="progress-fill"></div></div>
+  <p id="progress-text">0%</p>
+</div>
+
+<div id="canvas-container"></div>
+
+<a href="index.html" class="btn-glass btn-circle" id="btn-back">✕</a>
+<div id="gallery-title">NCT Maker</div>
+<button class="btn-glass" id="btn-view">📷 Xem ảnh</button>
+<button class="btn-glass btn-circle" id="btn-prev">‹</button>
+<button class="btn-glass btn-circle" id="btn-next">›</button>
+<button class="btn-glass" id="btn-sphere">↩ Trở lại khối cầu</button>
+
+<div id="lightbox">
+  <button class="btn-glass btn-circle" id="btn-close-lb">✕</button>
+  <button class="btn-glass btn-circle" id="lb-prev">‹</button>
+  <button class="btn-glass btn-circle" id="lb-next">›</button>
+  <div id="lb-media"></div>
+  <p class="lb-caption" id="lb-caption"></p>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// Minimal OrbitControls (no external dependency)
+// ══════════════════════════════════════════════
+function SimpleOrbitControls(camera, domElement) {
+  this.camera = camera;
+  this.domElement = domElement;
+  this.enableZoom = true;
+  this.enablePan = false;
+  this.minDistance = 200;
+  this.maxDistance = 1200;
+  this.target = new THREE.Vector3();
+
+  var _this = this;
+  var isDragging = false;
+  var lastX = 0, lastY = 0;
+  var spherical = new THREE.Spherical().setFromVector3(
+    camera.position.clone().sub(this.target)
+  );
+
+  domElement.addEventListener('mousedown', function(e) {
+    isDragging = true; lastX = e.clientX; lastY = e.clientY;
+  });
+  window.addEventListener('mouseup', function() { isDragging = false; });
+  window.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    var dx = e.clientX - lastX;
+    var dy = e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    spherical.theta -= dx * 0.005;
+    spherical.phi   -= dy * 0.005;
+    spherical.phi = Math.max(0.05, Math.min(Math.PI - 0.05, spherical.phi));
+    _this.update();
+  });
+  domElement.addEventListener('wheel', function(e) {
+    if (!_this.enableZoom) return;
+    e.preventDefault();
+    spherical.radius *= (1 + e.deltaY * 0.001);
+    spherical.radius = Math.max(_this.minDistance, Math.min(_this.maxDistance, spherical.radius));
+    _this.update();
+  }, { passive: false });
+
+  // Touch support
+  var lastTouchDist = null;
+  var lastTouch = null;
+  domElement.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 1) { lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }
+    if (e.touches.length === 2) { lastTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); }
+  }, { passive: true });
+  domElement.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 1 && lastTouch) {
+      var dx = e.touches[0].clientX - lastTouch.x;
+      var dy = e.touches[0].clientY - lastTouch.y;
+      lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      spherical.theta -= dx * 0.005;
+      spherical.phi   -= dy * 0.005;
+      spherical.phi = Math.max(0.05, Math.min(Math.PI - 0.05, spherical.phi));
+      _this.update();
+    }
+    if (e.touches.length === 2 && lastTouchDist !== null) {
+      var dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      spherical.radius *= lastTouchDist / dist;
+      spherical.radius = Math.max(_this.minDistance, Math.min(_this.maxDistance, spherical.radius));
+      lastTouchDist = dist;
+      _this.update();
+    }
+  }, { passive: true });
+
+  this._spherical = spherical;
+
+  this.update = function() {
+    var offset = new THREE.Vector3().setFromSpherical(spherical);
+    camera.position.copy(_this.target).add(offset);
+    camera.lookAt(_this.target);
+  };
+  this.update();
+}
+
+// ══════════════════════════════════════════════
+// 1. Asset list
+// ══════════════════════════════════════════════
+var RAW_ASSETS = [
+  "gallery/assets/110734541457780199417.jpg",
+  "gallery/assets/122db6a65c5ad2048b4b15.jpg",
+  "gallery/assets/122db6a65c5ad2048b4b5.jpg",
+  "gallery/assets/21999761284175575414.jpg",
+  "gallery/assets/2335072306866799150.jpg",
+  "gallery/assets/247186644849574296912.jpg",
+  "gallery/assets/2aoboqzad1io7ose77mau95gle8nzndtr7ohzjxc1.jpg",
+  "gallery/assets/2aoboqzad1lkzrv4rguunqpvjzvehgzqabyie0hs3.jpg",
+  "gallery/assets/2aoboqzad1q91sxxewojlaztjf5ypv0dkrroeeo44.jpg",
+  "gallery/assets/2aoboqzad1xdeonwnbknzyy3odvmitahal2rkzrg2.jpg",
+  "gallery/assets/36676531097259936828.jpg",
+  "gallery/assets/38185309530113249283.jpg",
+  "gallery/assets/38185309530113249287.jpg",
+  "gallery/assets/3a09ac3522c9ac97f5d86.jpg",
+  "gallery/assets/460254440877661086610.jpg",
+  "gallery/assets/46025444087766108669.jpg",
+  "gallery/assets/51088143115539397813.jpg",
+  "gallery/assets/5b710ccf80330e6d57221.jpg",
+  "gallery/assets/6364ae892175af2bf664.jpg",
+  "gallery/assets/6b6eefcc6330ed6eb4212.jpg",
+  "gallery/assets/894520501217386613.jpg",
+  "gallery/assets/pWF2AmF0GwAAAZzI7oMmYWYAYXUCYXMaAGGAfQ (1).mp4",
+  "gallery/assets/pWF2AmF0GwAAAZzJJTJSYWYAYXUCYXMaABN5Mg (1).mp4",
+  "gallery/assets/pwf2amf0gwaaazzi757cywyayxucyxmaactpuq11.mp4",
+  "gallery/assets/pwf2amf0gwaaazzi7qpiywyayxucyxmaaeeuqw16.mp4",
+  "gallery/assets/pwf2amf0gwaaazzi7qpiywyayxucyxmaaeeuqw4.mp4",
+];
+
+function isVideoUrl(u) { return /\.(mp4|webm|mov|mkv)$/i.test(u); }
+
+// ══════════════════════════════════════════════
+// 2. Fibonacci sphere nodes
+// ══════════════════════════════════════════════
+var TARGET_NODES = 30;
+var phi_g = Math.PI * (3 - Math.sqrt(5));
+var SPHERE_R = 200;
+
+var assetPaths = [], last = null;
+for (var _i = 0; _i < TARGET_NODES; _i++) {
+  var pool = RAW_ASSETS.length > 1 ? RAW_ASSETS.filter(function(u){ return u !== last; }) : RAW_ASSETS;
+  var pick = pool[Math.floor(Math.random() * pool.length)];
+  assetPaths.push(pick); last = pick;
+}
+
+var nodes = assetPaths.map(function(url, i) {
+  var y = 1 - (i / (TARGET_NODES - 1)) * 2;
+  var r = Math.sqrt(1 - y * y);
+  var theta = phi_g * i;
+  return { id: i, url: url, isVideo: isVideoUrl(url),
+    x: Math.cos(theta) * r * SPHERE_R, y: y * SPHERE_R, z: Math.sin(theta) * r * SPHERE_R };
+});
+
+// ══════════════════════════════════════════════
+// 3. Three.js scene
+// ══════════════════════════════════════════════
+var container = document.getElementById('canvas-container');
+var renderer = new THREE.WebGLRenderer({ antialias: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+renderer.setSize(window.innerWidth, window.innerHeight);
+container.appendChild(renderer.domElement);
+
+var scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0a0a);
+
+var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 10000);
+camera.position.set(0, 0, 450);
+
+var controls = new SimpleOrbitControls(camera, renderer.domElement);
+controls.minDistance = 200;
+controls.maxDistance = 1200;
+
+scene.add(new THREE.AmbientLight(0xffffff, 2.5));
+
+// ══════════════════════════════════════════════
+// 4. Texture loading (no crossOrigin)
+// ══════════════════════════════════════════════
+var textureCache = {};
+var thumbH = 35;
+
+function getOrLoadTexture(url) {
+  if (textureCache[url]) return textureCache[url];
+  var tex = new THREE.Texture();
+  tex.userData = {};
+  textureCache[url] = tex;
+  var img = new Image();
+  img.onload = function() {
+    var MAX = 512, w = img.width, h = img.height;
+    if (w > MAX || h > MAX) { var ratio = Math.min(MAX/w, MAX/h); w = Math.round(w*ratio); h = Math.round(h*ratio); }
+    var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    cv.getContext('2d').drawImage(img, 0, 0, w, h);
+    tex.image = cv; tex.colorSpace = THREE.SRGBColorSpace; tex.needsUpdate = true;
+    tex.userData = { width: img.width, height: img.height };
+  };
+  img.src = url;
+  return tex;
+}
+
+// Play icon geometry
+var playShape = new THREE.Shape(), ps = thumbH * 0.3;
+playShape.moveTo(-ps*.5,-ps*.6); playShape.lineTo(-ps*.5,ps*.6); playShape.lineTo(ps*.7,0); playShape.closePath();
+var playGeo = new THREE.ShapeGeometry(playShape);
+
+var sphereGroup = new THREE.Group();
+scene.add(sphereGroup);
+
+// ══════════════════════════════════════════════
+// 5. Build meshes
+// ══════════════════════════════════════════════
+var meshNodes = nodes.map(function(node) {
+  var planeGeo = new THREE.PlaneGeometry(1,1);
+  var group = new THREE.Group();
+  group.position.set(node.x, node.y, node.z);
+
+  if (node.isVideo) {
+    var mat = new THREE.MeshBasicMaterial({ color:0x1a1a2e, transparent:true, opacity:1 });
+    var mesh = new THREE.Mesh(planeGeo, mat); mesh.scale.set(thumbH, thumbH, 1);
+    var playMat = new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:.85, side:THREE.DoubleSide });
+    var playMesh = new THREE.Mesh(playGeo, playMat); playMesh.position.z = .5;
+    group.add(mesh); group.add(playMesh);
+    group.userData = { nodeId:node.id, mesh:mesh, mat:mat, isVideo:true, aspect:1 };
+  } else {
+    var tex = getOrLoadTexture(node.url);
+    var mat = new THREE.MeshBasicMaterial({ map:tex, transparent:true, opacity:0 });
+    var mesh = new THREE.Mesh(planeGeo, mat); mesh.scale.set(thumbH, thumbH, 1);
+    group.add(mesh);
+    group.userData = { nodeId:node.id, mesh:mesh, mat:mat, tex:tex, isVideo:false, aspect:1 };
+  }
+
+  sphereGroup.add(group);
+  return group;
+});
+
+// ══════════════════════════════════════════════
+// 6. State & UI
+// ══════════════════════════════════════════════
+var targetNodeId = null, appReady = false;
+
+function setTarget(id) {
+  if (id === targetNodeId) id = null;
+  targetNodeId = id;
+  controls.enableZoom = (id === null);
+  updateUI();
+}
+
+var elTitle  = document.getElementById('gallery-title');
+var elView   = document.getElementById('btn-view');
+var elPrev   = document.getElementById('btn-prev');
+var elNext   = document.getElementById('btn-next');
+var elSphere = document.getElementById('btn-sphere');
+var elBack   = document.getElementById('btn-back');
+
+function updateUI() {
+  var has = targetNodeId !== null;
+  elTitle.style.opacity = (has || !appReady) ? '0' : '1';
+  elTitle.style.transform = has ? 'translate(-50%,-50%) scale(.55)' : 'translate(-50%,-50%)';
+  elView.style.opacity = (!has && appReady) ? '1' : '0';
+  elView.style.transform = !has ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(80px)';
+  elPrev.style.opacity = has ? '1' : '0';
+  elPrev.style.transform = has ? 'translateY(-50%) scale(1)' : 'translateY(-50%) scale(0)';
+  elNext.style.opacity = has ? '1' : '0';
+  elNext.style.transform = has ? 'translateY(-50%) scale(1)' : 'translateY(-50%) scale(0)';
+  elSphere.style.opacity = has ? '1' : '0';
+  elSphere.style.transform = has ? 'translateY(0) scale(1)' : 'translateY(100px) scale(.8)';
+  elBack.style.opacity = appReady ? '1' : '0';
+}
+updateUI();
+
+// ══════════════════════════════════════════════
+// 7. Lightbox
+// ══════════════════════════════════════════════
+var lightboxIdx = 0;
+var lightbox = document.getElementById('lightbox');
+var lbMedia  = document.getElementById('lb-media');
+var lbCap    = document.getElementById('lb-caption');
+
+function openLightbox(idx) {
+  lightboxIdx = ((idx % nodes.length) + nodes.length) % nodes.length;
+  var node = nodes[lightboxIdx];
+  lbMedia.innerHTML = '';
+  if (node.isVideo) {
+    var vid = document.createElement('video');
+    vid.src = node.url; vid.controls = true; vid.autoplay = true; vid.loop = true;
+    lbMedia.appendChild(vid);
+  } else {
+    var img = document.createElement('img');
+    img.src = node.url; img.alt = 'Ảnh ' + (lightboxIdx+1);
+    lbMedia.appendChild(img);
+  }
+  lbCap.textContent = (lightboxIdx+1) + ' / ' + nodes.length + ' — ' + (node.isVideo ? '🎬 Video' : '📷 Ảnh');
+  lightbox.classList.add('active');
+  setTarget(node.id);
+}
+function closeLightbox() {
+  var vid = lbMedia.querySelector('video'); if (vid) vid.pause();
+  lbMedia.innerHTML = ''; lightbox.classList.remove('active');
+}
+
+document.getElementById('btn-view').addEventListener('click', function() { openLightbox(0); });
+document.getElementById('btn-prev').addEventListener('click', function() { openLightbox(lightboxIdx-1); });
+document.getElementById('btn-next').addEventListener('click', function() { openLightbox(lightboxIdx+1); });
+document.getElementById('btn-sphere').addEventListener('click', function() { closeLightbox(); setTarget(null); });
+document.getElementById('btn-close-lb').addEventListener('click', function() { closeLightbox(); setTarget(null); });
+document.getElementById('lb-prev').addEventListener('click', function() { openLightbox(lightboxIdx-1); });
+document.getElementById('lb-next').addEventListener('click', function() { openLightbox(lightboxIdx+1); });
+
+// ══════════════════════════════════════════════
+// 8. Raycaster – click nodes
+// ══════════════════════════════════════════════
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+
+renderer.domElement.addEventListener('click', function(e) {
+  if (lightbox.classList.contains('active')) return;
+  var rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+  mouse.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  var meshList = meshNodes.map(function(g){ return g.children[0]; }).filter(Boolean);
+  var hits = raycaster.intersectObjects(meshList, false);
+  if (hits.length > 0) {
+    openLightbox(hits[0].object.parent.userData.nodeId);
+  } else if (targetNodeId !== null) {
+    closeLightbox(); setTarget(null);
+  }
+});
+
+// ══════════════════════════════════════════════
+// 9. Loading progress
+// ══════════════════════════════════════════════
+var imageUrls = nodes.filter(function(n){ return !n.isVideo; }).map(function(n){ return n.url; });
+var uniqueUrls = imageUrls.filter(function(u,i,a){ return a.indexOf(u)===i; });
+var loadedCount = 0;
+
+function onImgDone() {
+  loadedCount++;
+  var pct = Math.round(loadedCount / Math.max(uniqueUrls.length,1) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = pct + '%';
+  if (loadedCount >= uniqueUrls.length) finishLoading();
+}
+function finishLoading() {
+  setTimeout(function() {
+    var ls = document.getElementById('loading-screen');
+    ls.classList.add('fade-out');
+    setTimeout(function(){ ls.style.display='none'; appReady=true; updateUI(); }, 800);
+  }, 300);
+}
+if (uniqueUrls.length === 0) { finishLoading(); }
+else { uniqueUrls.forEach(function(url){ var img=new Image(); img.onload=img.onerror=onImgDone; img.src=url; }); }
+
+// ══════════════════════════════════════════════
+// 10. Animate
+// ══════════════════════════════════════════════
+var clock = new THREE.Clock();
+var _quat = new THREE.Quaternion();
+
+function animate() {
+  requestAnimationFrame(animate);
+  var delta = Math.min(clock.getDelta(), .05);
+
+  // Auto-rotate sphere when no target
+  if (!targetNodeId) sphereGroup.rotation.y += .05 * delta;
+
+  // Billboard: face camera
+  camera.getWorldQuaternion(_quat);
+  for (var i=0; i<meshNodes.length; i++) meshNodes[i].quaternion.copy(_quat);
+
+  // Per-node
+  for (var j=0; j<meshNodes.length; j++) {
+    var g = meshNodes[j], d = g.userData;
+    var isH = (targetNodeId === d.nodeId);
+    var isDim = (targetNodeId !== null && !isH);
+    var tOp = isDim ? .2 : 1;
+
+    if (!d.isVideo && d.tex && d.tex.image) {
+      d.mat.opacity = THREE.MathUtils.lerp(d.mat.opacity, tOp, delta*4);
+    } else if (d.isVideo) {
+      d.mat.opacity = THREE.MathUtils.lerp(d.mat.opacity, tOp, delta*4);
+    }
+    if (d.tex && d.tex.userData && d.tex.userData.width) {
+      d.aspect = d.tex.userData.width / d.tex.userData.height;
+    }
+    if (d.mesh) {
+      var asp = d.aspect||1;
+      d.mesh.scale.x = THREE.MathUtils.lerp(d.mesh.scale.x, isH ? thumbH*4*asp : thumbH, delta*5);
+      d.mesh.scale.y = THREE.MathUtils.lerp(d.mesh.scale.y, isH ? thumbH*4     : thumbH, delta*5);
+    }
+  }
+
+  // Camera lean toward selected node
+  var origin = new THREE.Vector3();
+  if (targetNodeId !== null) {
+    for (var k=0; k<meshNodes.length; k++) {
+      if (meshNodes[k].userData.nodeId === targetNodeId) {
+        var wp = new THREE.Vector3(); meshNodes[k].getWorldPosition(wp);
+        var dir = wp.clone().normalize();
+        var cp  = wp.clone().add(dir.multiplyScalar(160));
+        camera.position.lerp(cp, delta*4);
+        controls.target.lerp(wp, delta*4);
+        camera.lookAt(controls.target);
+        break;
+      }
+    }
+  } else {
+    // Gently return to sphere distance
+    var desired = camera.position.clone().normalize().multiplyScalar(
+      Math.max(controls.minDistance, Math.min(controls._spherical.radius, controls.maxDistance))
+    );
+    camera.position.lerp(desired, delta*2);
+    controls.target.lerp(origin, delta*3);
+    camera.lookAt(controls.target);
+  }
+
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', function() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

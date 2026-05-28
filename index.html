@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DreamNavigator - Trợ lý Hướng nghiệp Thông minh</title>
+    <link rel="icon" type="image/png" href="assets/logo_maker.png">
+    <meta name="description" content="DreamNavigator (PC Master Builder) là hệ thống robot tự hành tích hợp AI hỗ trợ tư vấn và định hướng nghề nghiệp.">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Lexend:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo-group">
+                <div class="partner-logos">
+                    <img src="assets/logo_truong.png" alt="Logo Trường" class="nav-partner-logo">
+                    <img src="assets/logo_clb_unrounded.jpg" alt="Logo CLB" class="nav-partner-logo club-logo">
+                    <img src="assets/logo_lemigo.png" alt="Logo Lemigo" class="nav-partner-logo">
+                    <img src="assets/logo_maker.png" alt="Logo Maker" class="nav-partner-logo">
+                </div>
+                <span class="logo-divider"></span>
+                <h1 class="logo">Dream<span>Navigator</span></h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#about">Giới thiệu</a></li>
+                <li><a href="#features">Tính năng</a></li>
+                <li><a href="#technology">Công nghệ</a></li>
+                <li><a href="#team">Đội ngũ</a></li>
+                <li><a href="#future">Tương lai</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" id="home">
+        <div class="hero-content">
+            <h1 class="animate-up">Định Hướng Tương Lai Cùng <span class="text-gradient">AI</span></h1>
+            <p class="animate-up delay-1">Hệ thống robot tự hành tích hợp Trí Tuệ Nhân Tạo hỗ trợ tư vấn và định hướng nghề nghiệp cá nhân hóa theo MBTI & RIASEC.</p>
+            <div class="hero-buttons animate-up delay-2">
+                <a href="#about" class="btn btn-primary">Khám Phá Ngay</a>
+                <a href="gallery.html" class="btn btn-secondary">Xem Hành Trình</a>
+            </div>
+        </div>
+        <img src="assets/on-top-bottom-right-corner.png" alt="Overlay" style="position: absolute; bottom: 0; right: 0; height: 70%; width: auto; object-fit: contain; z-index: 2;">
+    </header>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <h2 class="section-title">Về Dự Án <span class="text-gradient">DreamNavigator</span></h2>
+            <div class="about-grid">
+                <div class="about-text reveal-left">
+                    <h3>Giải quyết bài toán chọn sai ngành nghề</h3>
+                    <p>Ý tưởng xuất phát từ thực tế nhiều học sinh hiện nay chưa có định hướng nghề nghiệp rõ ràng, thường lựa chọn ngành học dựa trên cảm tính hoặc xu hướng, dẫn đến nguy cơ lãng phí thời gian.</p>
+                    <p><strong>DreamNavigator (PC Master Builder)</strong> được xây dựng như một <em>“trợ lý hướng nghiệp thông minh”</em>, cho phép người dùng tương tác trực tiếp với robot qua giọng nói. Hệ thống kết hợp phân tích tính cách để đưa ra lộ trình phù hợp.</p>
+                    <ul class="check-list">
+                        <li><i class="fa-solid fa-check-circle"></i> Tương tác bằng giọng nói tự nhiên</li>
+                        <li><i class="fa-solid fa-check-circle"></i> Cá nhân hóa lộ trình hướng nghiệp</li>
+                        <li><i class="fa-solid fa-check-circle"></i> Tích hợp cử chỉ vật lý linh hoạt</li>
+                    </ul>
+                </div>
+                <div class="about-stats reveal-right">
+                    <div class="stat-card glass-card">
+                        <i class="fa-solid fa-brain"></i>
+                        <h4>AI Thông Minh</h4>
+                        <p>Xử lý ngôn ngữ tự nhiên, lập luận logic</p>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <i class="fa-solid fa-robot"></i>
+                        <h4>Robot Tự Hành</h4>
+                        <p>Tương tác thân thiện, trực quan</p>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <h4>MBTI & RIASEC</h4>
+                        <p>Chuẩn hóa dữ liệu tính cách</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section bg-dark">
+        <div class="container">
+            <h2 class="section-title">Tính Năng <span class="text-gradient">Nổi Bật</span></h2>
+            <div class="features-grid">
+                <div class="feature-card glass-card reveal-up">
+                    <div class="icon-wrapper"><i class="fa-solid fa-microphone-lines"></i></div>
+                    <h3>Giao Tiếp Giọng Nói</h3>
+                    <p>Tương tác hai chiều mượt mà với STT (Vosk) và TTS (Edge-TTS) bằng ngôn ngữ tự nhiên.</p>
+                </div>
+                <div class="feature-card glass-card reveal-up delay-1">
+                    <div class="icon-wrapper"><i class="fa-solid fa-id-card"></i></div>
+                    <h3>Cá Nhân Hóa</h3>
+                    <p>Phân tích đặc điểm dựa trên bài test tính cách và dữ liệu hội thoại thực tế của người dùng.</p>
+                </div>
+                <div class="feature-card glass-card reveal-up delay-2">
+                    <div class="icon-wrapper"><i class="fa-solid fa-robot"></i></div>
+                    <h3>Cử Chỉ & Cảm Xúc</h3>
+                    <p>Robot tích hợp màn hình LCD hiển thị biểu cảm và cánh tay servo MG90S để tạo cử chỉ sinh động, mang lại tương tác thân thiện.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section id="technology" class="section">
+        <div class="container">
+            <h2 class="section-title">Hệ Sinh Thái <span class="text-gradient">Công Nghệ</span></h2>
+            <p class="section-subtitle">Sự kết hợp hoàn hảo giữa phần cứng mạnh mẽ và phần mềm tối ưu</p>
+            
+            <div class="tech-grid">
+                <div class="tech-hardware reveal-left">
+                    <div class="hardware-card glass-card">
+                        <img src="assets/images/raspberry_pi_4.png" alt="Raspberry Pi 4B">
+                        <div class="hardware-info">
+                            <h3>Raspberry Pi 4B</h3>
+                            <p>Bộ não trung tâm xử lý AI và điều khiển hệ thống trên nền tảng Linux (Raspberry Pi OS).</p>
+                        </div>
+                    </div>
+                    <div class="hardware-card glass-card">
+                        <img src="assets/images/esp32_board.png" alt="ESP32 Board">
+                        <div class="hardware-info">
+                            <h3>ESP32 & Arduino</h3>
+                            <p>Mạch điều khiển ngoại vi, kết nối bluetooth, điều khiển cánh tay Servo chính xác.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="tech-software reveal-right">
+                    <div class="software-list">
+                        <div class="software-item glass-card">
+                            <i class="fa-brands fa-python"></i>
+                            <div>
+                                <h4>Python & C++</h4>
+                                <p>Ngôn ngữ cốt lõi phát triển logic và nhúng.</p>
+                            </div>
+                        </div>
+                        <div class="software-item glass-card">
+                            <i class="fa-solid fa-microchip"></i>
+                            <div>
+                                <h4>LLaMA 32B (GGUF)</h4>
+                                <p>Mô hình ngôn ngữ lớn chạy cục bộ.</p>
+                            </div>
+                        </div>
+                        <div class="software-item glass-card">
+                            <i class="fa-solid fa-eye"></i>
+                            <div>
+                                <h4>OpenCV</h4>
+                                <p>Xử lý hình ảnh và nhận diện khuôn mặt qua Camera.</p>
+                            </div>
+                        </div>
+                        <div class="software-item glass-card">
+                            <i class="fa-solid fa-cloud"></i>
+                            <div>
+                                <h4>Cloudflare Tunnel</h4>
+                                <p>Kết nối an toàn cho hệ thống và nâng cấp AI.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="section bg-dark">
+        <div class="container">
+            <h2 class="section-title">Nhóm <span class="text-gradient">Phát Triển</span></h2>
+            
+            <div class="team-grid">
+                <!-- Học sinh -->
+                <div class="team-member glass-card reveal-up">
+                    <div class="member-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+                    <h3>Nguyễn Võ Nguyên</h3>
+                    <p class="role">Nhóm trưởng - Lớp 11A1</p>
+                </div>
+                <div class="team-member glass-card reveal-up delay-1">
+                    <div class="member-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+                    <h3>Lê Nguyễn Huy Khan</h3>
+                    <p class="role">Thành viên - Lớp 11C9</p>
+                </div>
+            </div>
+
+            <h3 class="teachers-title reveal-up">Giáo Viên Hướng Dẫn</h3>
+            <div class="team-grid teachers-grid">
+                <div class="team-member glass-card reveal-up">
+                    <div class="member-avatar"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    <h3>Thầy Trần Minh Phụng</h3>
+                </div>
+                <div class="team-member glass-card reveal-up delay-1">
+                    <div class="member-avatar"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    <h3>Cô Đoàn Thụy Kim Phượng</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Future Section -->
+    <section id="future" class="section">
+        <div class="container">
+            <h2 class="section-title">Định Hướng <span class="text-gradient">Tương Lai</span></h2>
+            <div class="timeline">
+                <div class="timeline-item reveal-up">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-card">
+                        <h3>Nâng cấp AI</h3>
+                        <p>Tối ưu mô hình chuyên biệt cho hướng nghiệp, tăng cường tốc độ phản hồi.</p>
+                    </div>
+                </div>
+                <div class="timeline-item reveal-up">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-card">
+                        <h3>Mở rộng Dữ liệu</h3>
+                        <p>Tích hợp API thị trường lao động, dữ liệu tuyển sinh từ các trường Đại học.</p>
+                    </div>
+                </div>
+                <div class="timeline-item reveal-up">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-card">
+                        <h3>Triển khai Ứng dụng</h3>
+                        <p>Đưa robot vào sử dụng rộng rãi tại các trường THPT và ngày hội tuyển sinh.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center;">
+                <img src="assets/logo_truong.png" alt="Logo Trường" style="height: 50px; object-fit: contain;">
+                <img src="assets/logo_clb_unrounded.jpg" alt="Logo CLB" style="height: 50px; object-fit: contain; border-radius: 50%;">
+                <img src="assets/logo_lemigo.png" alt="Logo Lemigo" style="height: 50px; object-fit: contain;">
+                <img src="assets/logo_maker.png" alt="Logo Maker" style="height: 50px; object-fit: contain;">
+            </div>
+            <h2 class="logo">Dream<span>Navigator</span></h2>
+            <p>Sản phẩm dự thi khoa học kỹ thuật - Bảng D3</p>
+            <p>&copy; 2026 NCT Maker. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

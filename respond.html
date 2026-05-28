@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NCT Maker - Giao Tiếp</title>
+  <link rel="icon" type="image/png" href="assets/logo_maker.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #0a0a0a;
+      --primary-color: #3b82f6;
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --text-main: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.6);
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'Lexend', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    /* Particles Background */
+    .bg-animation {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: -1;
+      background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0a0a0a 100%);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* --- Welcome Screen --- */
+    #welcome-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .logo-container {
+      margin-bottom: 2rem;
+    }
+    
+    .logo-container img {
+      height: 80px;
+      object-fit: contain;
+    }
+
+    h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #60a5fa, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 2.5rem;
+      line-height: 1.5;
+    }
+
+    .input-group {
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--text-main);
+      font-family: 'Lexend', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+
+    input[type="text"]::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 12px;
+      border: none;
+      font-family: 'Lexend', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .skip-text {
+      margin-top: 1rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .skip-text:active { color: white; }
+
+    /* --- Chat Screen --- */
+    #chat-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .status-badge {
+      padding: 8px 16px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: var(--primary-color);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .status-dot {
+      width: 8px; height: 8px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--primary-color);
+    }
+    .status-dot.pulsing {
+      animation: pulse 1.5s infinite;
+    }
+
+    .mic-container {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      margin: 2rem 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .mic-btn {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.4));
+      border: 2px solid rgba(59, 130, 246, 0.5);
+      color: white;
+      font-size: 2.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+    }
+
+    .mic-btn:active {
+      transform: scale(0.9);
+    }
+
+    .mic-btn.listening {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      border-color: #fca5a5;
+      box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+      animation: micPulse 1.5s infinite;
+    }
+
+    .ripple {
+      position: absolute;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.3);
+      z-index: 5;
+      opacity: 0;
+    }
+
+    .mic-btn.listening ~ .ripple {
+      background: rgba(239, 68, 68, 0.3);
+      animation: rippleEffect 2s infinite;
+    }
+
+    .transcript-box {
+      width: 100%;
+      min-height: 80px;
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      font-size: 1rem;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.9);
+      transition: all 0.3s ease;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.5; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+      100% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    @keyframes micPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes rippleEffect {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+
+  <div class="container">
+    <!-- Welcome Screen -->
+    <div id="welcome-screen">
+      <div class="logo-container">
+        <img src="assets/logo_maker.png" alt="NCT Maker" onerror="this.src=''">
+      </div>
+      <h1>Xin chào!</h1>
+      <p class="subtitle">Nhập tên của bạn để robot Dream Navigator có thể chào bạn nhé.</p>
+      
+      <div class="input-group">
+        <input type="text" id="user-name" placeholder="Tên của bạn..." autocomplete="off">
+      </div>
+      
+      <button class="btn btn-primary" onclick="startChat()">
+        Bắt đầu giao tiếp <i class="fa-solid fa-arrow-right"></i>
+      </button>
+      
+      <div class="skip-text" onclick="skipName()">Không, cảm ơn (Bỏ qua)</div>
+    </div>
+
+    <!-- Chat Screen -->
+    <div id="chat-screen">
+      <div class="status-badge">
+        <div class="status-dot pulsing" id="status-dot"></div>
+        <span id="status-text">Đang kết nối...</span>
+      </div>
+
+      <p id="greeting-text" style="font-weight: 600; font-size: 1.2rem; margin-bottom: 1rem;"></p>
+
+      <div class="mic-container">
+        <button class="mic-btn" id="mic-btn" onclick="toggleListening()">
+          <i class="fa-solid fa-microphone"></i>
+        </button>
+        <div class="ripple"></div>
+      </div>
+
+      <p class="helper-text" id="helper-text">Nhấn vào micro để nói</p>
+
+      <div class="transcript-box" id="transcript-box">
+        <span style="color: rgba(255,255,255,0.4); font-style: italic;">Nội dung bạn nói sẽ hiển thị ở đây...</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let userName = "";
+    let isListening = false;
+    let recognition = null;
+    let pollInterval = null;
+    
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const chatScreen = document.getElementById('chat-screen');
+    const nameInput = document.getElementById('user-name');
+    const greetingText = document.getElementById('greeting-text');
+    const micBtn = document.getElementById('mic-btn');
+    const transcriptBox = document.getElementById('transcript-box');
+    const helperText = document.getElementById('helper-text');
+    const statusText = document.getElementById('status-text');
+    const statusDot = document.getElementById('status-dot');
+
+    // Khởi tạo Speech Recognition
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'vi-VN';
+
+      recognition.onstart = function() {
+        isListening = true;
+        micBtn.classList.add('listening');
+        helperText.textContent = "Đang nghe...";
+        transcriptBox.innerHTML = '<span style="color: rgba(255,255,255,0.4); font-style: italic;">Đang nghe...</span>';
+      };
+
+      recognition.onresult = function(event) {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        
+        transcriptBox.innerHTML = finalTranscript + '<i style="color: #ccc;">' + interimTranscript + '</i>';
+        
+        if (finalTranscript !== '') {
+          sendToBot(finalTranscript);
+        }
+      };
+
+      recognition.onerror = function(event) {
+        console.error("Speech error: ", event.error);
+        stopListening();
+        helperText.textContent = "Lỗi nhận diện. Vui lòng thử lại.";
+      };
+
+      recognition.onend = function() {
+        stopListening();
+        if (transcriptBox.innerText.includes('Đang nghe...')) {
+            transcriptBox.innerHTML = '<span style="color: rgba(255,255,255,0.4); font-style: italic;">Không nghe rõ, vui lòng thử lại...</span>';
+        }
+      };
+    } else {
+      helperText.textContent = "Trình duyệt của bạn không hỗ trợ nhận diện giọng nói.";
+      micBtn.style.opacity = "0.5";
+      micBtn.style.pointerEvents = "none";
+    }
+
+    function startChat() {
+      const name = nameInput.value.trim();
+      if (name) {
+        userName = name;
+        greetingText.textContent = `Chào ${userName}!`;
+      } else {
+        greetingText.textContent = "Chào bạn!";
+      }
+      switchToChat();
+    }
+
+    function skipName() {
+      userName = "";
+      greetingText.textContent = "Chào bạn!";
+      switchToChat();
+    }
+
+    function switchToChat() {
+      welcomeScreen.style.display = 'none';
+      chatScreen.style.display = 'flex';
+      startPollingStatus();
+    }
+
+    function toggleListening() {
+      if (!recognition) return;
+      
+      if (isListening) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
+    }
+
+    function stopListening() {
+      isListening = false;
+      micBtn.classList.remove('listening');
+      helperText.textContent = "Nhấn vào micro để nói";
+    }
+
+    async function sendToBot(text) {
+      try {
+        const response = await fetch('https://api.dream.lemigo.xyz/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text, name: userName })
+        });
+        
+        if (response.ok) {
+          console.log("Sent successfully");
+        }
+      } catch (e) {
+        console.error("Failed to send: ", e);
+        statusText.textContent = "Lỗi kết nối";
+        statusDot.style.backgroundColor = "#ef4444";
+      }
+    }
+
+    function startPollingStatus() {
+      if (pollInterval) clearInterval(pollInterval);
+      
+      // Poll every 1 second
+      pollInterval = setInterval(async () => {
+        try {
+          const response = await fetch('https://api.dream.lemigo.xyz/api/status');
+          if (response.ok) {
+            const data = await response.json();
+            updateStatusUI(data.status);
+          }
+        } catch (e) {
+          updateStatusUI("Mất kết nối");
+        }
+      }, 1000);
+    }
+
+    function updateStatusUI(status) {
+      statusText.textContent = status;
+      statusDot.className = 'status-dot'; // reset class
+      
+      if (status === "Nhàn rỗi" || status === "Đã trả lời") {
+        statusDot.style.backgroundColor = "#22c55e"; // Green
+        statusDot.style.boxShadow = "0 0 8px #22c55e";
+      } else if (status === "Mất kết nối") {
+        statusDot.style.backgroundColor = "#ef4444"; // Red
+        statusDot.style.boxShadow = "0 0 8px #ef4444";
+      } else {
+        // Đã gửi câu hỏi, Đang suy nghĩ, Đang trả lời
+        statusDot.style.backgroundColor = "#3b82f6"; // Blue
+        statusDot.style.boxShadow = "0 0 8px #3b82f6";
+        statusDot.classList.add('pulsing');
+      }
+    }
+  </script>
+</body>
+</html>
